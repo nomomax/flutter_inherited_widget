@@ -125,15 +125,15 @@ class MyStorePageState extends State<MyStorePage> {
     setState(() {
       _inSearch = !_inSearch;
     });
-
+    AppStateWidget.of(context).setProductList(Server.getProductList());
     _controller.clear();
-    //productList.currentState!.productList = Server.getProductList();
   }
 
   void _handleSearch() {
     _focusNode.unfocus();
     final String filter = _controller.text;
-    //productList.currentState!.productList = Server.getProductList(filter: filter);
+    AppStateWidget.of(context)
+        .setProductList(Server.getProductList(filter: filter));
   }
 
   @override
