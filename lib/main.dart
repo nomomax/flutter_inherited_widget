@@ -225,11 +225,11 @@ class ProductListWidget extends StatelessWidget {
   const ProductListWidget({Key? key}) : super(key: key);
 
   void _handleAddToCart(String id, BuildContext context) {
-    AppStateScope.of(context).itemsInCart.add(id);
+    AppStateWidget.of(context).addToCart(id);
   }
 
   void _handleRemoveFromCart(String id, BuildContext context) {
-    AppStateScope.of(context).itemsInCart.remove(id);
+    AppStateWidget.of(context).removeFromCart(id);
   }
 
   Widget _buildProductTile(String id, BuildContext context) {
