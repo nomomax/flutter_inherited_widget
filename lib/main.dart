@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-final GlobalKey<ProductListWidgetState> productList =
-    GlobalKey<ProductListWidgetState>();
-
 void main() {
   runApp(
     const AppStateWidget(
@@ -130,14 +127,13 @@ class MyStorePageState extends State<MyStorePage> {
     });
 
     _controller.clear();
-    productList.currentState!.productList = Server.getProductList();
+    //productList.currentState!.productList = Server.getProductList();
   }
 
   void _handleSearch() {
     _focusNode.unfocus();
     final String filter = _controller.text;
-    productList.currentState!.productList =
-        Server.getProductList(filter: filter);
+    //productList.currentState!.productList = Server.getProductList(filter: filter);
   }
 
   @override
@@ -178,8 +174,8 @@ class MyStorePageState extends State<MyStorePage> {
             backgroundColor: Colors.white,
             pinned: true,
           ),
-          SliverToBoxAdapter(
-            child: ProductListWidget(key: productList),
+          const SliverToBoxAdapter(
+            child: ProductListWidget(),
           ),
         ],
       ),
@@ -225,53 +221,32 @@ class ShoppingCartIcon extends StatelessWidget {
   }
 }
 
-class ProductListWidget extends StatefulWidget {
+class ProductListWidget extends StatelessWidget {
   const ProductListWidget({Key? key}) : super(key: key);
 
-  @override
-  ProductListWidgetState createState() => ProductListWidgetState();
-}
-
-class ProductListWidgetState extends State<ProductListWidget> {
-  List<String> get productList => _productList;
-  List<String> _productList = Server.getProductList();
-
-  set productList(List<String> value) {
-    setState(() {
-      _productList = value;
-    });
+  void _handleAddToCart(String id, BuildContext context) {
+    AppStateScope.of(context).itemsInCart.add(id);
   }
 
-  Set<String> get itemsInCart => _itemsInCart;
-  Set<String> _itemsInCart = <String>{};
-
-  set itemsInCart(Set<String> value) {
-    setState(() {
-      _itemsInCart = value;
-    });
+  void _handleRemoveFromCart(String id, BuildContext context) {
+    AppStateScope.of(context).itemsInCart.remove(id);
   }
 
-  void _handleAddToCart(String id) {
-    itemsInCart = _itemsInCart..add(id);
-  }
-
-  void _handleRemoveFromCart(String id) {
-    itemsInCart = _itemsInCart..remove(id);
-  }
-
-  Widget _buildProductTile(String id) {
+  Widget _buildProductTile(String id, BuildContext context) {
     return ProductTile(
       product: Server.getProductById(id),
-      purchased: itemsInCart.contains(id),
-      onAddToCart: () => _handleAddToCart(id),
-      onRemoveFromCart: () => _handleRemoveFromCart(id),
+      purchased: AppStateScope.of(context).itemsInCart.contains(id),
+      onAddToCart: () => _handleAddToCart(id, context),
+      onRemoveFromCart: () => _handleRemoveFromCart(id, context),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<String> productList = AppStateScope.of(context).productList;
     return Column(
-      children: productList.map(_buildProductTile).toList(),
+      children:
+          productList.map((id) => _buildProductTile(id, context)).toList(),
     );
   }
 }
